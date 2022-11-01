@@ -1,0 +1,1443 @@
+---
+title: "DSF 2022: Statistics"
+author: "Greg Chism"
+date: October 25, 2022
+format: uaz-revealjs
+editor: visual
+---
+
+## Statistics
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: column
+```{r doge, fig.width=12, fig.height=12}
+library(ggdogs)
+library(tidyverse)
+library(faux)
+set.seed(101)
+
+datdog <- rnorm_multi(n = 30, 
+                  mu = c(121, 78),
+                  sd = c(31.97262, 115.244),
+                  r = c(0.75),
+                  varnames = c("Glucose", "Insulin"),
+                  empirical = FALSE) |>
+  filter(Insulin > 0)
+
+datdog |>
+  ggplot(aes(x = Glucose, y = Insulin)) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", size = 2) +
+  geom_dog(dog = "husky", size = 0.5) +
+  theme_minimal(base_size = 30)
+
+```
+:::
+
+::: {.column .incremental width="50%"}
+### Why do we need statistics?
+
+-   Proper methods
+-   Correct analysis
+-   Effectively present results
+:::
+:::
+
+## Statistics
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: column
+```{r doge1, fig.width=12, fig.height=12}
+library(ggdogs)
+library(tidyverse)
+library(faux)
+
+datdog |>
+  ggplot(aes(x = Glucose, y = Insulin)) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", size = 2) +
+  geom_dog(dog = "husky", size = 3.5) +
+  theme_minimal(base_size = 30)
+
+```
+:::
+
+::: {.column width="50%"}
+### Why do we need statistics?
+
+-   Proper methods
+-   Correct analysis
+-   **Effectively present results?..**
+:::
+:::
+
+## Road Map
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column .incremental width="50%"}
+-   Data and Sampling
+
+-   Distributions
+
+-   Central Limit Theorem
+
+-   Statistical Significance & Power
+
+-   Hypothesis Testing
+:::
+
+::: {.column width="50%"}
+![Artwork by \@allison_horst](_extensions/uaz/roadmap.png)
+:::
+:::
+
+## Road Map
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+-   **Data and Sampling**
+
+-   Distributions
+
+-   Central Limit Theorem
+
+-   Statistical Significance & Power
+
+-   Hypothesis Testing
+:::
+
+::: {.column width="50%"}
+![](_extensions/uaz/data.jpg)
+:::
+:::
+
+## Case Study
+
+![](_extensions/uaz/Underline.png)
+
+::: incremental
+-   Objective: Evaluate the effectiveness of cognitive-behavior therapy for chronic fatigue syndrome.
+
+-   Participant pool: 142 patients recruited from referrals by primary care physicians and consultants to a clinic that specializes in chronic fatigue syndrome.
+
+-   Actual participants (N): 60 of 142 patients entered the study, some were excluded for various reasons and others refused to participate
+:::
+
+## Case Study: Results
+
+![](_extensions/uaz/Underline.png)
+
+Distribution of patients with good outcomes at 6-month follow-up. 7 patients dropped out of the study: 3 from treatment, 4 from control.
+
+![](_extensions/uaz/CaseResults.png){width="526"}
+
+::: incremental
+-   Good outcomes in treatment: $19/27 \approx 0.70 \to 70%$
+-   Good outcomes in control group: $5/26 \approx 0.19 \to 19$
+:::
+
+## Conclusion?
+
+![](_extensions/uaz/Underline.png)
+
+Are the results generalizable to all with chronic fatigue syndrome?
+
+::: incremental
+-   Only volunteers with specific characteristics
+-   Not generalizable, but the results are encouraging
+-   What next?
+:::
+
+## Data Types
+
+![](_extensions/uaz/Underline.png)
+
+![Artwork by \@allison_horst](_extensions/uaz/datatypes_1.png){width="649"}
+
+## Data Types
+
+![](_extensions/uaz/Underline.png)
+
+![Artwork by \@allison_horst](_extensions/uaz/datatypes_2.png){width="816"}
+
+## Sampling: Simple random
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/simple.png){fig-align="left"}
+
+## Sampling: Stratified
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/stratified.png){fig-align="left"}
+
+## Sampling: Clustered
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/cluster.png){fig-align="left"}
+
+## Sampling: Multistaged
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/multistage.png){fig-align="left"}
+
+## Sampling vs. Selection
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/rand-popn.png){fig-align="left" width="250"}
+
+## Sampling vs. Selection
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/rand-sampl.png){fig-align="left" width="508"}
+
+## Sampling vs. Selection
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/rand-selection.png){width="740"}
+
+## Types of Variables
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r types-variables, fig.width=12, fig.height=12}
+library(tidyverse)
+library(faux)
+library(ggpubr)
+library(cowplot)
+dat <- rnorm_multi(n = 100, 
+                  mu = c(121, 78),
+                  sd = c(31.97262, 115.244),
+                  r = c(0.75),
+                  varnames = c("Glucose", "Insulin"),
+                  empirical = FALSE) |>
+  filter(Insulin > 0)
+
+dat |>
+ggplot(aes(x = Glucose, y = Insulin)) +
+  geom_point(size = 10, color = "white") +
+  theme_transparent() +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        plot.background = element_rect(fill = "#0C234B"),
+        axis.title.x = element_text(color = "white", size = 50, face = "bold"),
+        axis.title.y = element_text(color = "white", size = 50, angle = 90, face = "bold")) +
+  xlab("Explanatory Variable") +
+  ylab("Response Variable")
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   **Response variable**: variable that is predicted by another
+-   **Explanatory variable**: variable that predicts the response variable
+:::
+:::
+
+## Road Map
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+-   Data and Sampling
+
+-   **Distributions**
+
+-   Central Limit Theorem
+
+-   Statistical Significance & Power
+
+-   Hypothesis Testing
+:::
+
+::: {.column .incremental width="50%"}
+![Artwork by \@allison_horst](_extensions/uaz/not_normal.png)
+:::
+:::
+
+## Distributions: Gaussian
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r gaussian}
+library(tidyverse)
+norm <- seq(-4, 4, length = 100)
+Normal <- dnorm(norm)
+data.frame(x = norm, y = Normal) |>
+ggplot(aes(x = norm, y = Normal)) +
+  geom_line(size = 3, color = "white") +
+  geom_segment(x = mean(norm), xend = mean(norm), y = 0, yend = max(Normal), size = 2, color = "white") +
+  geom_segment(x = median(norm), xend = median(norm), y = 0, yend = max(Normal), size = 2, color = "white") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2)) 
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   Symmetrical
+-   Mean = Median
+-   No changes to data needed
+:::
+:::
+
+## Distributions: Skewed
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r skewed}
+LSkew <- rbeta(10000, 2, 5)
+
+data.frame(x = LSkew) |>
+ggplot(aes(x = LSkew)) +
+  geom_density(size = 3, color = "white") +
+  geom_vline(xintercept = mean(LSkew), size = 2, color = "white") +
+  geom_vline(xintercept = median(LSkew), size = 2, color = "white", linetype = "dashed") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2))
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   Not symmetrical
+-   Mean = Median
+-   Transform data (e.g., square-root)
+:::
+:::
+
+## Distributions: Skewed
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r skewed-2}
+LSkew <- rbeta(10000, 2, 5)
+
+data.frame(x = LSkew) |>
+ggplot(aes(x = sqrt(LSkew))) +
+  geom_density(size = 3, color = "white") +
+  geom_vline(xintercept = mean(sqrt(LSkew)), size = 2, color = "white") +
+  geom_vline(xintercept = median(sqrt(LSkew)), size = 2, color = "white", linetype = "dashed") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2))
+```
+:::
+
+::: {.column width="50%"}
+-   Not symmetrical
+-   Mean = Median
+-   Transform data (e.g., square-root)
+:::
+:::
+
+## Distributions: Bimodal
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r bimodal}
+library(truncnorm)
+
+nn <- 1e4
+sims <- c(rtruncnorm(nn/2, a=1, b=5, mean=2, sd=.5),
+                    rtruncnorm(nn/2, a=1, b=5, mean=4, sd=.5))
+
+Bimod <- data.frame(x = sims) |>
+ggplot(aes(x = sims)) +
+  geom_density(size = 3, color = "white") +
+  geom_vline(xintercept = mean(sims), size = 2, color = "white") +
+  geom_vline(xintercept = median(sims), size = 2, color = "white", linetype = "dashed") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2))
+Bimod
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   Symmetrical\*
+-   Mean = Median\*
+-   Break up the data
+:::
+:::
+
+## Distributions: Bimodal
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r bimodal-2}
+library(truncnorm)
+
+nn <- 1e4
+sims <- c(rtruncnorm(nn/2, a=1, b=5, mean=2, sd=.5),
+                    rtruncnorm(nn/2, a=1, b=5, mean=4, sd=.5))
+
+Bimod <- data.frame(x = sims)
+Bimod1 <- Bimod |>
+  filter(x < mean(x))
+  
+Bimod2 <- Bimod |>
+  filter(x >= mean(x)) 
+Bimod1 |> 
+ggplot(aes(x = x)) +
+  geom_density(size = 3, color = "white", fill = "gray") +
+  geom_density(data = Bimod2, aes(x = x), size = 3, color = "white") +
+  geom_vline(xintercept = mean(Bimod1$x), size = 2, color = "white") +
+  geom_vline(xintercept = mean(Bimod2$x), size = 2, color = "white", linetype = "dashed") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2))
+
+```
+:::
+
+-   Symmetrical\*
+-   Mean = Median\*
+-   Break up the data
+:::
+
+## Road Map
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+-   Data and Sampling
+
+-   Distributions
+
+-   **Central Limit Theorem**
+
+-   Statistical Significance & Power
+
+-   Hypothesis Testing
+:::
+
+::: {.column width="50%"}
+```{r fig.width=12, fig.height=12}
+# Lambda is the number of geese that arrive per hour
+lambda <- 220 / 24
+# Number of random samples to be drawn
+numsim <- 10000
+# Initialize variables
+mean5 <- rep(0, numsim)
+mean15 <- rep(0, numsim)
+mean30 <- rep(0, numsim)
+mean100 <- rep(0, numsim)
+mean200 <- rep(0, numsim)
+# Loop for simulating
+for (i in 1:numsim) {
+
+  # sample means
+  mean5[i] <- mean(rpois(5, lambda))
+  mean15[i] <- mean(rpois(15, lambda))
+  mean30[i] <- mean(rpois(30, lambda))
+  mean100[i] <- mean(rpois(100, lambda))
+  mean200[i] <- mean(rpois(200, lambda))
+}
+# Create five data frames for these sampling distributions with varying sample sizes
+# Create a variable "sample_size" used as an identifier
+n_5 <- data.frame(sample_size = as.factor(rep(5, 10000)), sample_means = mean5)
+n_15 <- data.frame(sample_size = as.factor(rep(15, 10000)), sample_means = mean15)
+n_30 <- data.frame(sample_size = as.factor(rep(30, 10000)), sample_means = mean30)
+n_100 <- data.frame(sample_size = as.factor(rep(100, 10000)), sample_means = mean100)
+n_200 <- data.frame(sample_size = as.factor(rep(200, 10000)), sample_means = mean200)
+# Combine into a single data frame
+# The function rbind() combines data frames by rows
+sampling_distributions <- rbind(n_5, n_15, n_30, n_100, n_200)
+
+# Using ggplot()
+ggplot(
+  data = sampling_distributions,
+  mapping = aes(x = sample_means)
+) +
+  geom_density(aes(fill = sample_size, color = sample_size), alpha = 0.2) +
+  geom_vline(xintercept = lambda, linetype = "dashed", size = 2) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme_void(base_size = 50) +
+  theme(axis.text = element_blank()) +
+  labs(fill = "Sample size", color = "Sample size") +
+  theme(legend.position = "none")
+```
+:::
+:::
+
+## Central Limit Theorem: Uniform
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r uniform-slt}
+library(gganimate)
+library(transformr)
+sample_mean <- function(FUN, n) {
+  samples <- FUN(n)
+  mean(samples)
+}
+
+distribution_sample_mean <- function(FUN, n, montecarlo_n) {
+  name <- glue::glue("sample_{n}")
+  rerun(montecarlo_n, sample_mean(FUN, n)) %>% 
+    map(data.frame) %>% 
+    bind_rows() %>% 
+    rename(!!quo_name(name) := ".x..i..")
+}
+
+simulate_sample_means <- function(FUN, montecarlo_n, sample_sizes) {
+  map_dfc(sample_sizes, ~ distribution_sample_mean(FUN, .x, montecarlo_n)) %>% 
+  cbind(sims = 1:montecarlo_n) %>% 
+  pivot_longer(-sims, names_to = "samples_sizes", values_to = "value") %>% 
+  mutate(samples_sizes = str_extract(samples_sizes, "\\d+"),
+         samples_sizes = as.numeric(samples_sizes))
+}
+
+ns <- c(2, 5, 10, 20, 30, 50, 100, 1000, 10000)
+
+uniform <- simulate_sample_means(runif, 3000, ns) %>% 
+  rename(uniform = value) %>% 
+  group_by(samples_sizes) %>% 
+  mutate(z = (uniform - 0.5)*sqrt(12*samples_sizes)) %>% 
+  ungroup() %>% 
+  mutate(samples_sizes = factor(samples_sizes, ordered = TRUE))
+
+
+uniform %>% 
+  ggplot(aes(z, fill = samples_sizes)) +
+  geom_density(aes(group = NA)) +
+  transition_states(samples_sizes,
+                    transition_length = 2,
+    state_length = 1) +
+  stat_function(fun = dnorm,
+                         args = list(mean = 0, sd = 1),
+                inherit.aes = FALSE, size = 3, color = "red") +
+  theme_pubr(base_size = 17) +
+  theme(legend.position = "none") +
+  xlab("Z-Score") +
+  ylab("Density") +
+  enter_fade() +
+  exit_shrink() +
+  labs(subtitle = "Sample size {closest_state}",
+       title = "Distribution of Sample Mean") +
+  view_follow() -> p
+
+animate(p, res = 250, height = 4, width = 5, units = "in")
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   Uniform distribution is approximately normal with $N > 10$
+-   $N > 30$ is sufficient for most distributions
+:::
+:::
+
+## Central Limit Theorem: Skewed
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r skewed-slt}
+lognormal <- simulate_sample_means(rlnorm, 3000, ns) %>% 
+  rename(lognormal = value) %>% 
+  group_by(samples_sizes) %>% 
+  mutate(z = (lognormal - exp(1/2) )/sqrt(( ( exp(1) - 1) * exp(1) ) / samples_sizes ) ) %>% 
+  ungroup() %>% 
+  mutate(samples_sizes = factor(samples_sizes, ordered = TRUE))
+
+
+lognormal %>% 
+  ggplot(aes(z, fill = samples_sizes)) +
+  geom_density(aes(group = NA)) +
+  transition_states(samples_sizes,
+                    transition_length = 2,
+    state_length = 1) +
+  stat_function(fun = dnorm,
+                         args = list(mean = 0, sd = 1),
+                inherit.aes = FALSE, size = 3, color = "red") +
+  theme_pubr(base_size = 17) +
+  theme(legend.position = "none") +
+  xlab("Z-Score") +
+  ylab("Density") +
+  enter_fade() +
+  exit_shrink() +
+  labs(subtitle = "Sample size {closest_state}",
+       title = "Distribution of Sample Mean") +
+  view_follow() -> p
+
+animate(p, res = 250, height = 4, width = 5, units = "in")
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   Skewed distribution is approximately normal with $N > 30$
+-   Moderate to high skew may require $N > 100$...
+-   Transformations are more feasible than increasing your sample size
+:::
+:::
+
+## Normality: 68, 95, 99.7 rule
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r stdev}
+library(tidyverse)
+set.seed(3030)
+
+normseq <- seq(-4, 4, length = 1000)
+norm <- data.frame(Normal = rnorm(normseq, mean = 0, sd = 1))
+norm |>
+ggplot(aes(x = Normal)) +
+  geom_histogram(size = 3, fill = "white", color = "gray") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        plot.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2)) 
+```
+:::
+
+::: {.column width="50%"}
+:::
+:::
+
+## Normality: 68, 95, 99.7 rule
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r stdev-1}
+norm |>
+ggplot(aes(x = Normal)) +
+  geom_histogram(size = 3, fill = "white", color = "gray") +
+    geom_vline(xintercept = (mean(norm$Normal) + sd(norm$Normal)), y = 0, size = 2, color = "red") +
+  geom_vline(xintercept = (mean(norm$Normal) - sd(norm$Normal)), y = 0, size = 2, color = "red") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        plot.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2)) 
+```
+:::
+
+::: {.column width="50%"}
+-   1 Standard deviation = 68%
+:::
+:::
+
+## Normality: 68, 95, 99.7 rule
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r stdev-2}
+norm |>
+ggplot(aes(x = Normal)) +
+  geom_histogram(size = 3, fill = "white", color = "gray") +
+  geom_vline(xintercept = (mean(norm$Normal) + 2 * sd(norm$Normal)), y = 0, size = 2, color = "red", linetype = "dashed") +
+  geom_vline(xintercept = (mean(norm$Normal) + 2 * - sd(norm$Normal)), y = 0, size = 2, color = "red", linetype = "dashed") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        plot.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2)) 
+```
+:::
+
+::: {.column width="50%"}
+-   1 Standard deviation = 68%
+-   2 Standard deviations = 95%
+:::
+:::
+
+## Normality: 68, 95, 99.7 rule
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r stdev-3}
+norm |>
+ggplot(aes(x = Normal)) +
+  geom_histogram(size = 3, fill = "white", color = "gray") +
+  geom_vline(xintercept = (mean(norm$Normal) + 3 * sd(norm$Normal)), y = 0, size = 2, color = "red", linetype = "dotted") +
+  geom_vline(xintercept = (mean(norm$Normal) + 3 * - sd(norm$Normal)), y = 0, size = 2, color = "red", linetype = "dotted") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        plot.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2)) 
+```
+:::
+
+::: {.column width="50%"}
+-   1 Standard deviation = 68%
+-   2 Standard deviations = 95%
+-   3 Standard deviations = 99.7%
+:::
+:::
+
+## Normality: 68, 95, 99.7 rule
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r z-score}
+library(dlookr)
+norm |>
+  mutate(Normal = transform(Normal, method = "zscore")) |>
+ggplot(aes(x = Normal)) +
+  geom_histogram(size = 3, fill = "white", color = "gray") +
+  geom_vline(xintercept = (mean(norm$Normal) + 2 * sd(norm$Normal)), y = 0, size = 2, color = "red", linetype = "dashed") +
+  geom_vline(xintercept = (mean(norm$Normal) + 2 * - sd(norm$Normal)), y = 0, size = 2, color = "red", linetype = "dashed") +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        plot.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2),
+        axis.title.x = element_text(color = "white", size = 40),
+        axis.text.x = element_text(color = "white", size = 30)) +
+  xlab("Z-Score")
+```
+:::
+
+::: {.column width="50%"}
+### Z-Score
+
+The number of standard deviations a value falls above or below the mean - e.g., 2 standard deviations: $Z = 2$
+:::
+:::
+
+## Road Map
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+-   Data and Sampling
+
+-   Distributions
+
+-   Central Limit Theorem
+
+-   **Statistical Significance & Power**
+
+-   Hypothesis Testing
+:::
+
+::: {.column width="50%"}
+![Artwork by \@allison_horst](_extensions/uaz/p_value_mic_hog.jpg)
+:::
+:::
+
+## P-Values
+
+![](_extensions/uaz/Underline.png)
+
+What is the likelihood that your data is different that expected from random variation?
+
+## P-Values
+
+![](_extensions/uaz/Underline.png)
+
+What is the likelihood that your data is different that expected from random variation?
+
+::: columns
+::: {.column width="50%"}
+```{r p-values}
+library(tidyverse)
+ggplot(data.frame(x = c(0, 5)), aes(x)) +
+    stat_function(fun = df,
+                geom = "area",
+                fill = "gray",
+                xlim = c((qf(.95, df1 = 3, df2 = 48)), 5),
+                args = list(
+                  df1 = 3,
+                  df2 = 49
+                )) +
+  stat_function(fun = df,
+                geom = "line",
+                args = list(
+                  df1 = 3,
+                  df2 = 49
+                ),
+                size = 3,
+                color = "white") +
+  geom_segment(y = 0.05, yend = 0.15, x = 3, xend = 3, color = "white", size = 2) +
+  annotate("text", x = 3, y = 0.2, label = "p < 0.05", color = "white", size = 16) +
+  theme_void(base_size = 18) +
+  theme(panel.background = element_rect(fill = "#0C234B"),
+        plot.background = element_rect(fill = "#0C234B"),
+        axis.line.x.bottom = element_line(color="white", size = 2))
+  
+```
+
+F-Distribution
+:::
+
+::: {.column .incremental width="50%"}
+-   Probability of observing data at least as favorable to the alternative hypothesis, if the null hypothesis is not true.
+
+-   Translation: The relationship that we find is not from random chance.
+:::
+:::
+
+## Confidence Intervals
+
+![](_extensions/uaz/Underline.png)
+
+::: incremental
+-   Significance as $< 0.05$ we are saying that 5% of our conclusions will be incorrect.
+-   This means that we can have 95% Confidence that our samples will contain the true value of a statistic from the population.
+-   Example: we collect 30 samples and measure the mean $\bar{X}$, so 27.5 of those samples will contain the population mean $\mu$
+:::
+
+## Confidence Intervals
+
+![](_extensions/uaz/Underline.png)
+
+```{r CIs}
+set.seed(42)
+myControls <- data.frame(value=rnorm(2000, mean = 30, sd=20))
+myData <- data.frame(value=rnorm(2000, mean = 40, sd=20))
+cases <- NULL
+controls <- NULL
+for (i in 1:25) {
+  cases[[i]] <- sample(myData$value, size=32)
+  controls[[i]] <- sample(myControls$value, size=32)
+}
+
+estimates <- data.frame(lower=NA, 
+               meanDiff=sapply(cases, mean)-sapply(controls, mean),
+               caseSSE= sapply(cases, function(x) sum((x-mean(x))^2)),
+               controlSSE = sapply(controls, function(x) sum((x-mean(x))^2)),
+               sd=NA,
+               upper=NA)
+
+estimates$sd <- sqrt((estimates$caseSSE+estimates$controlSSE)/64)
+
+se <- estimates$sd/sqrt(32)  # basic stats here
+
+# we have two tails, so we want the 97.5%, not the 
+# 95%, quantile (that gives us 2.5% at the end) to get
+# the number of standard deviations away (T-statistic).
+
+tBound <- qt(0.975, df=31)
+
+# if you wanted the Z-statistic, you could:
+
+zBound <-qnorm(0.975)
+
+estimates$lower <- estimates$meanDiff - se*tBound # or zBound
+estimates$upper <- estimates$meanDiff + se*tBound # or zBound
+
+estimates$problem = estimates$lower >10 | estimates$upper < 10
+
+tTest <- mapply(t.test, x=controls, y=cases)
+# flip it and make it a data frame
+tTest <- as.data.frame(t(tTest))
+estimates$p <- unlist(tTest$p.value)
+estimates$p <- round(estimates$p, 4)
+
+estimates$significance <- ""
+estimates$significance[estimates$p<.05] <- "*"
+estimates$significance[estimates$p<.01] <- "**"
+estimates$significance[estimates$p<.001] <- "***"
+
+estimates$sampleNum <- as.numeric(row.names(estimates))
+
+popDifferenceSE <- sqrt(20^2+20^2)/sqrt(32)
+fakeData<-data.frame(value=rnorm(1000000, mean=10, sd=popDifferenceSE))
+
+# get libraries we need for plotting and stacking the plots
+
+library(ggplot2)
+library(grid)
+library(gridExtra)
+
+# set colors
+problemColors <- c("TRUE"="red", "FALSE"="darkgrey")
+colorScale <- scale_colour_manual(name="problem", values=problemColors)
+
+# set the data and the most used elements
+finalTop <- ggplot(data=estimates, aes(x=meanDiff, y=sampleNum)) +
+  
+  # add error bars, parameterized by other columns of 'estimates'
+  geom_errorbarh(aes(xmin=lower,xmax=upper, color=problem)) +
+  
+  # add point estimate, colored according to the problem column of 'estimate'  
+  geom_point(aes(color = problem), size = 2)  + 
+  
+  # draw a vertical line at the true difference in mean.
+  geom_vline(xintercept = 10, color="blue", size = 1.25) +
+  
+  # flip the y axis
+  scale_y_reverse() +
+  
+  # make sure the graph is wide enough to include the text we added  
+  scale_x_continuous(limits=c(-10,30)) +
+  
+  # color the "problem" status according to a scale we set up separately
+  colorScale +
+  
+  # Get rid of gridlines, axes
+  theme_void(base_size = 16) +
+  
+  # Some theme changes. Get rid of the legend.
+  theme(legend.position = "none",
+        
+  # Position the plot title at 65% of the width, just over our true mean diff.
+        plot.title = element_text(hjust = 0.65),
+  
+  # Also make sure there's space at the top, but none on bottom!
+  plot.margin = unit(c(10, 0, -2, 0), "pt")) +
+        
+  # Add a title to the graph
+  ggtitle("Mean, 95% CI") 
+
+# set the data and the most used elements
+finalBottom <- ggplot(data = fakeData, mapping = aes(value)) +
+  
+  # make sure the graph is wide enough to match the top graph 
+  scale_x_continuous(limits=c(-10,30)) +
+  
+  # We want to draw a density curve
+  geom_density(size = 1.25) +
+  
+  # start with a minimal theme.  We can't use theme_void bc it 
+  # clobbers the axis numbers, which we want.
+  theme_minimal(base_size = 16) +
+  
+  # Some theme changes. Put a light grey line in for major vertical grid lines
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.y = element_blank(),
+        
+        # Remove all the axis text except the x values
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.title.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        
+        # Also make sure there's space at the bottom, but none on top!
+        plot.margin = unit(c(-2, 0, 10, 0), "pt"))
+  
+
+finalComplete <- grid.arrange(finalTop, finalBottom, 
+                              ncol = 1, heights = c(4, 1))
+
+```
+
+## Statistical Error
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/Error1.png){width="879"}
+
+## Statistical Error
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/Error2.png){width="879"}
+
+## Statistical Error
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/Error3.png){width="879"}
+
+## Statistical Error
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/Error4.png){width="879"}
+
+-   A *Type I Error* is rejecting the null hypothesis when $H_0$ is true.
+
+## Statistical Error
+
+![](_extensions/uaz/Underline.png)
+
+![](_extensions/uaz/Error5.png){width="879"}
+
+-   A *Type I Error* is rejecting the null hypothesis when $H_0$ is true
+
+-   A *Type II Error* is rejecting the null hypothesis when $H_A$ is true
+
+## Statistical Error: Type I Error
+
+![](_extensions/uaz/Underline.png)
+
+![Artwork by \@allison_horst](_extensions/uaz/type_1_errors.png){width="788"}
+
+## Statistical Error: Type II Error
+
+![](_extensions/uaz/Underline.png)
+
+![Artwork by \@allison_horst](_extensions/uaz/type_2_errors.png){width="1082"}
+
+## Statistical Power
+
+![](_extensions/uaz/Underline.png)
+
+**Power = 1 - Type II Error**
+
+::: incremental
+-   Low Statistical Power: Large risk of committing Type II errors, e.g. a false negative.
+-   High Statistical Power: Small risk of committing Type II errors.
+:::
+
+## Power Analysis
+
+![](_extensions/uaz/Underline2.png)
+
+<https://rpsychologist.com/d3/nhst/>
+
+**Statistical Power**: The probability of accepting the alternative hypothesis if it is true.
+
+## Power Analysis
+
+![](_extensions/uaz/Underline2.png)
+
+<https://rpsychologist.com/d3/nhst/>
+
+-   **Effect Size**: The strength of a result present in the population.
+
+## Power Analysis
+
+![](_extensions/uaz/Underline2.png)
+
+<https://rpsychologist.com/d3/nhst/>
+
+-   **Effect Size**: The strength of a result present in the population.
+-   **Sample Size**: The number of observations in the sample.
+
+## Power Analysis
+
+![](_extensions/uaz/Underline2.png)
+
+<https://rpsychologist.com/d3/nhst/>
+
+-   **Effect Size**: The strength of a result present in the population.
+-   **Sample Size**: The number of observations in the sample.
+-   **Significance**: The significance level used in the
+
+## Road Map
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+-   Data and Sampling
+
+-   Distributions
+
+-   Central Limit Theorem
+
+-   Statistical Significance & Power
+
+-   **Hypothesis Testing**
+:::
+
+::: {.column width="50%"}
+![Artwork by \@allison_horst](_extensions/uaz/krill.png)
+:::
+:::
+
+## Hypothesis Testing in Statistics
+
+![](_extensions/uaz/Underline.png)
+
+::: incremental
+-   What hypothesis does statistics test?
+-   How does this fit into the Scientific Method?
+:::
+
+## One-Sided Hypothesis Test
+
+![](_extensions/uaz/Underline.png)
+
+```{r one-sided, fig.width = 9, fig.height = 3}
+ggplot(data.frame(x = c(-3, 5)), aes(x)) +
+  stat_function(
+    fun = dnorm,
+    geom = "area",
+    fill = "steelblue",
+    alpha = .3
+  ) +
+  stat_function(
+    fun = dnorm,
+    geom = "area",
+    fill = "steelblue",
+    xlim = c(qnorm(.9), 4)
+  ) +
+  labs(
+    title = "One-Sided Hypothesis Test",
+    x = "Z-Score",
+    y = "Density"
+  ) + 
+  geom_segment(x = qnorm(.95), xend = qnorm(.95), y = 0.125, yend = 0.2) +
+  annotate("text", x = qnorm(.95), y = 0.2385, label = "p < 0.1", size = 6) +
+  ggpubr::theme_pubr(base_size = 18)
+
+```
+
+::: incremental
+-   **One-Sided/One-Tailed**: *p* differs from one direction (and not the other)
+:::
+
+## Two-Sided Hypothesis Test
+
+![](_extensions/uaz/Underline.png)
+
+```{r two-sided, fig.width = 9, fig.height = 3}
+ggplot(data.frame(x = c(-3, 5)), aes(x)) +
+  stat_function(
+    fun = dnorm,
+    geom = "area",
+    fill = "steelblue",
+    alpha = .3
+  ) +
+  stat_function(
+    fun = dnorm,
+    geom = "area",
+    fill = "steelblue",
+    xlim = c(qnorm(.95), 4)
+  ) +
+    stat_function(
+    fun = dnorm,
+    geom = "area",
+    fill = "steelblue",
+    xlim = c(-4, qnorm(.05))
+  ) +
+  labs(
+    title = "Two-Sided Hypothesis Test",
+    x = "Z-Score",
+    y = "Density"
+  ) + 
+  geom_segment(x = qnorm(.95), xend = 0.5, y = 0.1, yend = 0.2) +
+    geom_segment(x = qnorm(.05), xend = -0.5, y = 0.1, yend = 0.2) +
+  annotate("text", x = 0, y = 0.275, label = "p < 0.05", size = 6) +
+  ggpubr::theme_pubr(base_size = 18)
+
+```
+
+::: incremental
+-   **Two-Sided/Two-Tailed**: *p* differs from either the left or right
+:::
+
+## Linear Regression
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r regn1, fig.width=12, fig.height=12}
+library(tidyverse)
+library(faux)
+library(ggpubr)
+library(cowplot)
+library(ggxmean)
+
+set.seed(1110)
+dat <- rnorm_multi(n = 30, 
+                  mu = c(121, 78),
+                  sd = c(31.97262, 115.244),
+                  r = c(0.75),
+                  varnames = c("Glucose", "Insulin"),
+                  empirical = FALSE) |>
+  filter(Insulin > 0)
+
+dat |>
+  ggplot() +
+  aes(x = Glucose,
+      y = Insulin) +
+  geom_point(size = 10) + 
+  ggxmean::geom_lm(size = 2) +
+  theme_minimal(base_size = 35) +
+  stat_regline_equation(label.y = 350, size = 20) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme(axis.text = element_blank())
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   Relationship between numerical variables
+-   $y = \beta x + y_i$
+-   $\beta$ is the slope
+-   $y_i$ is the y-intercept
+:::
+:::
+
+## Linear Regression: Residuals
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r regn2, fig.width=12, fig.height=12}
+library(tidyverse)
+library(faux)
+library(ggpubr)
+library(cowplot)
+library(ggxmean)
+
+dat |>
+  ggplot() +
+  aes(x = Glucose,
+      y = Insulin) +
+  geom_point(size = 10) + 
+  ggxmean::geom_lm_fitted(color = "goldenrod3",
+                          size = 7.5) +
+  ggxmean::geom_lm(size = 2) +
+  ggxmean::geom_lm_residuals(linetype = "dashed", size = 2) +
+  stat_regline_equation(label.y = 350, size = 20) +
+  theme_minimal(base_size = 35) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme(axis.text = element_blank())
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   Residuals: $r$
+-   Actual value: $y$
+-   Predicted value (on the line): $y_0$
+-   Formula: $r = y-y_0$
+-   Smaller residuals = better model fit
+:::
+:::
+
+## Linear Regression: Model Fit
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r regn3, fig.width=12, fig.height=12}
+library(tidyverse)
+library(faux)
+library(ggpubr)
+library(cowplot)
+library(ggxmean)
+
+
+dat |>
+  ggplot() +
+  aes(x = Glucose,
+      y = Insulin) +
+  geom_point(size = 10) + 
+  ggxmean::geom_lm_fitted(color = "goldenrod3",
+                          size = 7.5) +
+  ggxmean::geom_lm(size = 2) +
+  ggxmean::geom_lm_residuals(linetype = "dashed", size = 2) +
+  stat_regline_equation(label.y = 350, size = 20) +
+  stat_regline_equation(label.y = 275, 
+    aes(label =  paste(..rr.label..)),
+    formula =  y ~ x, size = 20
+  ) +
+  theme_minimal(base_size = 35) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme(axis.text = element_blank())
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   Model Fit: $R^2$
+-   Mean of the response variable: $\bar{y}$
+-   Sum of Squares Regression: $(y-\bar{y})^2$\
+-   Sum of Squares Total: $(y_0-\bar{y})^2$
+-   $R^2 = 1- \frac{(y-\bar{y})^2} {(y_0-\bar{y})^2}$
+:::
+:::
+
+## Linear Regression: Model Fit
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r regn4, fig.width=12, fig.height=12}
+library(tidyverse)
+library(faux)
+library(ggpubr)
+library(cowplot)
+library(ggxmean)
+
+
+dat |>
+  ggplot() +
+  aes(x = Glucose,
+      y = Insulin) +
+  geom_point(size = 10) + 
+  ggxmean::geom_lm_fitted(color = "goldenrod3",
+                          size = 7.5) +
+  ggxmean::geom_lm(size = 2) +
+  ggxmean::geom_lm_residuals(linetype = "dashed", size = 2) +
+  stat_regline_equation(label.y = 350, size = 20) +
+  stat_regline_equation(label.y = 275, aes(label =  paste(..rr.label..)),
+    formula =  y ~ x, size = 20
+  ) +
+  stat_regline_equation(label.y = 225,
+    aes(label =  paste(..adj.rr.label..)),
+    formula =  y ~ x, size = 20
+  ) +
+  theme_minimal(base_size = 35) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme(axis.text = element_blank())
+```
+:::
+
+::: {.column .incremental width="50%"}
+-   $R^2_{adj}$ penalizes based on the number of predictor variables
+:::
+:::
+
+## Linear Regression: Extrapolation
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r regn5, fig.width=12, fig.height=12}
+library(tidyverse)
+library(faux)
+library(ggpubr)
+library(cowplot)
+library(ggxmean)
+
+
+dat |>
+  ggplot() +
+  aes(x = Glucose,
+      y = Insulin) +
+  geom_point(size = 10) + 
+  geom_point(aes(x = 225, y = 450), size = 15, color = "red") +
+  ggxmean::geom_lm(size = 2) +
+  stat_regline_equation(label.y = 350, size = 20) +
+  theme_minimal(base_size = 35) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme(axis.text = element_blank())
+```
+:::
+
+::: {.column .incremental width="50%"}
+Can we make any inference about the new data point?
+
+-   No, the point is outside of the bounds of our regression model.
+
+-   This would be **extrapolation**, which is possible, but not advised.
+:::
+:::
+
+## Linear Regression: Extrapolation
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r regn6, fig.width=12, fig.height=12}
+library(tidyverse)
+library(faux)
+library(ggpubr)
+library(cowplot)
+library(ggxmean)
+
+dat |>
+  add_row(Glucose = 225, Insulin = 450) |>
+  ggplot() +
+  aes(x = Glucose,
+      y = Insulin) +
+  geom_point(size = 10) + 
+  geom_point(aes(x = 225, y = 450), size = 15, color = "red") +
+  ggxmean::geom_lm(size = 2) +
+  stat_regline_equation(label.y = 350, size = 20) +
+  theme_minimal(base_size = 35) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme(axis.text = element_blank())
+```
+:::
+
+::: {.column .incremental width="50%"}
+Instead you'd have to run a new model.
+:::
+:::
+
+## Correlation = Causation?
+
+![](_extensions/uaz/Underline.png)
+
+::: columns
+::: {.column width="50%"}
+```{r corrn, fig.width=12, fig.height=12}
+
+set.seed(11113)
+dat1 <- rnorm_multi(n = 30, 
+                  mu = c(121, 160),
+                  sd = c(31.97262, 7),
+                  r = c(0.9),
+                  varnames = c("Height_cm", "Glucose"),
+                  empirical = FALSE) |>
+  filter(Height_cm > 0)
+
+dat1 |>
+  ggplot() +
+  aes(x = Glucose,
+      y = Height_cm) +
+  geom_point(size = 10) + 
+  ggxmean::geom_lm(size = 2) +
+  theme_minimal(base_size = 35) +
+  stat_regline_equation(label.y = 170, size = 20) +
+  xlab("Height (cm)") +
+  ylab("Blood Glucose (mmol/L)")  
+
+```
+:::
+
+::: {.column .incremental width="50%"}
+Is height (cm) related to Blood Glucose (mmol/L)?
+
+-   Maybe...
+
+-   There's no information on how the data was collected or if this is experimental at all.
+
+-   [Bad Correlations...](https://www.tylervigen.com/spurious-correlations)
+:::
+:::
+
+## Done!!
+
+![](_extensions/uaz/Underline.png)
+
+![Artwork by \@allison_horst](_extensions/uaz/whaleshark.png){width="714"}
